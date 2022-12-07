@@ -1,14 +1,12 @@
 import * as React from 'react';
+import { Box } from '@mui/material';
+import CountryList from './components/country-list';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          test
-        </p>
-      </header>
-    </div>
+    <Box>
+      <CountryList />
+    </Box>
   );
 }
 
