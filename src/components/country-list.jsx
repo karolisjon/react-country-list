@@ -1,19 +1,25 @@
 import * as React from 'react';
-import { 
-  Container, 
-  Paper, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
+import {
+  Button,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material'
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
+  const [sortState, setSortState] = React.useState('none');
 
-  console.table(countries);
+  const sortMethods = {
+    none: { method: (a, b) => null },
+    ascending: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
+    descending: { method: (a, b) => b.name.localeCompare(a.name, 'en') }
+  }
 
   const fetchAll = async () => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
@@ -24,10 +30,26 @@ const CountryList = () => {
 
   React.useEffect(() => {
     fetchAll();
-  }, []);
+  }, [countries]);
 
   return (
     <Container maxWidth='md'>
+      <Button
+        variant='primary'
+        value='ascending'
+        onClick={(e) => { setSortState(e.target.value) }}
+      >
+        Ascending
+      </Button>
+
+      <Button
+        variant='primary'
+        value='descending'
+        onClick={(e) => { setSortState(e.target.value) }}
+      >
+        Descending
+      </Button>
+
       <TableContainer component={Paper}>
         <Table aria-label="customized table">
           <TableHead sx={{ backgroundColor: '#000' }}>
@@ -39,21 +61,21 @@ const CountryList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {countries.map(({ index, name, region, area, independent }) => (
-              <TableRow 
-              sx={{ 
-                '&:hover': {
-                  cursor: 'pointer',
-                  backgroundColor: 'rgb(216 210 251)'
-                },
-                '&:nth-of-type(odd)': {
-                  backgroundColor: 'rgb(241 239 253)',
+            {countries.sort(sortMethods[sortState].method).map(({ index, name, region, area, independent }) => (
+              <TableRow
+                sx={{
                   '&:hover': {
+                    cursor: 'pointer',
                     backgroundColor: 'rgb(216 210 251)'
                   },
-                },
-              }}
-              key={index}
+                  '&:nth-of-type(odd)': {
+                    backgroundColor: 'rgb(241 239 253)',
+                    '&:hover': {
+                      backgroundColor: 'rgb(216 210 251)'
+                    },
+                  },
+                }}
+                key={index}
               >
                 <TableCell>{name}</TableCell>
                 <TableCell align='right'>{region}</TableCell>
