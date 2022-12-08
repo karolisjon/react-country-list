@@ -1,24 +1,27 @@
 import * as React from 'react';
 import {
-  Button,
   Container,
+  FormControl,
+  MenuItem,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material'
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
-  const [sortState, setSortState] = React.useState('none');
+  const [sortState, setSortState] = React.useState('');
 
   const sortMethods = {
-    none: { method: (a, b) => null },
-    ascending: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
-    descending: { method: (a, b) => b.name.localeCompare(a.name, 'en') }
+    '': { method: (a, b) => null },
+    ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
+    descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') }
   }
 
   const fetchAll = async () => {
@@ -30,25 +33,24 @@ const CountryList = () => {
 
   React.useEffect(() => {
     fetchAll();
-  }, [countries]);
+  }, []);
 
   return (
     <Container maxWidth='md'>
-      <Button
-        variant='primary'
-        value='ascending'
-        onClick={(e) => { setSortState(e.target.value) }}
-      >
-        Ascending
-      </Button>
 
-      <Button
-        variant='primary'
-        value='descending'
-        onClick={(e) => { setSortState(e.target.value) }}
-      >
-        Descending
-      </Button>
+      <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
+        <Typography sx={{ mr: 1 }}>Name</Typography>
+        <Select
+          variant='standard'
+          value={sortState}
+          onChange={(e) => setSortState(e.target.value)}
+          sx={{ minWidth: 140, my: 2 }}
+        >
+          {/* <MenuItem value='none'>None</MenuItem> */}
+          <MenuItem value='ascendingName'>A to Z</MenuItem>
+          <MenuItem value='descendingName'>Z to A</MenuItem>
+        </Select>
+      </FormControl>
 
       <TableContainer component={Paper}>
         <Table aria-label="customized table">
