@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Box,
   Container,
   FormControl,
   MenuItem,
@@ -21,7 +22,9 @@ const CountryList = () => {
   const sortMethods = {
     '': { method: (a, b) => null },
     ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
-    descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') }
+    descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
+    ascendingArea: { method: (a, b) => a.area - b.area },
+    descendingArea: { method: (a, b) => b.area - a.area },
   }
 
   const fetchAll = async () => {
@@ -38,19 +41,48 @@ const CountryList = () => {
   return (
     <Container maxWidth='md'>
 
-      <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
-        <Typography sx={{ mr: 1 }}>Name</Typography>
-        <Select
-          variant='standard'
-          value={sortState}
-          onChange={(e) => setSortState(e.target.value)}
-          sx={{ minWidth: 140, my: 2 }}
-        >
-          {/* <MenuItem value='none'>None</MenuItem> */}
-          <MenuItem value='ascendingName'>A to Z</MenuItem>
-          <MenuItem value='descendingName'>Z to A</MenuItem>
-        </Select>
-      </FormControl>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
+      }}>
+
+        <FormControl sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'baseline',
+          '&:nth-child(1)': { mr: 2 }
+        }}>
+          <Typography sx={{ mr: 1 }}>NAME</Typography>
+          <Select
+            variant='standard'
+            value={sortState}
+            onChange={(e) => setSortState(e.target.value)}
+            sx={{ minWidth: 140, my: 2 }}
+          >
+            <MenuItem value='ascendingName'>A to Z</MenuItem>
+            <MenuItem value='descendingName'>Z to A</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'baseline'
+        }}>
+          <Typography sx={{ mr: 1 }}>AREA</Typography>
+          <Select
+            variant='standard'
+            value={sortState}
+            onChange={(e) => setSortState(e.target.value)}
+            sx={{ minWidth: 140, my: 2 }}
+          >
+            <MenuItem value='ascendingArea'>Ascending</MenuItem>
+            <MenuItem value='descendingArea'>Descending</MenuItem>
+          </Select>
+        </FormControl>
+
+      </Box>
 
       <TableContainer component={Paper}>
         <Table aria-label="customized table">
