@@ -40,7 +40,21 @@ const CountryList = () => {
           </TableHead>
           <TableBody>
             {countries.map(({ index, name, region, area, independent }) => (
-              <TableRow key={index}>
+              <TableRow 
+              sx={{ 
+                '&:hover': {
+                  cursor: 'pointer',
+                  backgroundColor: 'rgb(216 210 251)'
+                },
+                '&:nth-of-type(odd)': {
+                  backgroundColor: 'rgb(241 239 253)',
+                  '&:hover': {
+                    backgroundColor: 'rgb(216 210 251)'
+                  },
+                },
+              }}
+              key={index}
+              >
                 <TableCell>{name}</TableCell>
                 <TableCell align='right'>{region}</TableCell>
                 <TableCell align='right'>{area}</TableCell>
