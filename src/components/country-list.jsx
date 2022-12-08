@@ -1,8 +1,19 @@
 import * as React from 'react';
-import { Box, Container, Typography } from '@mui/material'
+import { 
+  Container, 
+  Paper, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+} from '@mui/material'
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
+
+  console.table(countries);
 
   const fetchAll = async () => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
@@ -16,22 +27,29 @@ const CountryList = () => {
   }, []);
 
   return (
-    <Container maxWidth='lg'>
-      <Box>
-        {countries.map(({ name, region, area, independent}) => (
-          <Box sx={{
-            my: 2,
-            p: 2,
-            backgroundColor: 'rgb(238 234 251)',
-            borderRadius: 1
-          }}>
-            <Typography>Name: {name}</Typography>
-            <Typography>Region: {region}</Typography>
-            <Typography>Area: {area}</Typography>
-            <Typography>Independent: {independent}</Typography>
-          </Box>
-        ))}
-      </Box>
+    <Container maxWidth='md'>
+      <TableContainer component={Paper}>
+        <Table aria-label="customized table">
+          <TableHead sx={{ backgroundColor: '#000' }}>
+            <TableRow>
+              <TableCell sx={{ color: '#fff' }}>Name</TableCell>
+              <TableCell align='right' sx={{ color: '#fff' }}>Region</TableCell>
+              <TableCell align='right' sx={{ color: '#fff' }}>Area</TableCell>
+              <TableCell align='right' sx={{ color: '#fff' }}>Independent</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {countries.map(({ index, name, region, area, independent }) => (
+              <TableRow key={index}>
+                <TableCell>{name}</TableCell>
+                <TableCell align='right'>{region}</TableCell>
+                <TableCell align='right'>{area}</TableCell>
+                <TableCell align='right'>{independent.toString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer >
     </Container >
   )
 }
