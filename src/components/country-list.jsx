@@ -3,9 +3,11 @@ import {
   Box,
   Container,
   FormControl,
+  Input,
   MenuItem,
   Paper,
   Select,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -17,15 +19,22 @@ import {
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
-  const [sortState, setSortState] = React.useState('');
+  const [sortState, setSortState] = React.useState('ascendingName');
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const sortMethods = {
     '': { method: (a, b) => null },
     ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
     descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
-    ascendingArea: { method: (a, b) => a.area - b.area },
-    descendingArea: { method: (a, b) => b.area - a.area },
-  }
+  };
+
+  const handleSort = (event) => {
+    setSortState(event.target.value);
+  };
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
   const fetchAll = async () => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
@@ -44,44 +53,33 @@ const CountryList = () => {
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'flex-end'
+        justifyContent: 'space-between',
+        alignItems: 'center',
       }}>
+
+        <Input
+          type='text'
+          placeholder='Search...'
+          onChange={handleSearch}
+        />
 
         <FormControl sx={{
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'baseline',
-          '&:nth-child(1)': { mr: 2 }
+          '&:nth-of-type(1)': { mr: 2 }
         }}>
-          <Typography sx={{ mr: 1 }}>NAME</Typography>
+          <Typography sx={{ mr: 1 }}>SORT NAME</Typography>
           <Select
             variant='standard'
             value={sortState}
-            onChange={(e) => setSortState(e.target.value)}
+            onChange={handleSort}
             sx={{ minWidth: 140, my: 2 }}
           >
             <MenuItem value='ascendingName'>A to Z</MenuItem>
             <MenuItem value='descendingName'>Z to A</MenuItem>
           </Select>
         </FormControl>
-
-        <FormControl sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'baseline'
-        }}>
-          <Typography sx={{ mr: 1 }}>AREA</Typography>
-          <Select
-            variant='standard'
-            value={sortState}
-            onChange={(e) => setSortState(e.target.value)}
-            sx={{ minWidth: 140, my: 2 }}
-          >
-            <MenuItem value='ascendingArea'>Ascending</MenuItem>
-            <MenuItem value='descendingArea'>Descending</MenuItem>
-          </Select>
-        </FormControl>
-
       </Box>
 
       <TableContainer component={Paper}>
@@ -95,7 +93,13 @@ const CountryList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {countries.sort(sortMethods[sortState].method).map(({ index, name, region, area, independent }) => (
+            {countries.filter((country) => {
+              if (searchTerm === '') {
+                return country;
+              } else if (country.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                return country;
+              }
+            }).sort(sortMethods[sortState].method).map(({ index, name, region, area, independent }) => (
               <TableRow
                 sx={{
                   '&:hover': {
