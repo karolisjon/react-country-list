@@ -4,10 +4,10 @@ import {
   Container,
   FormControl,
   Input,
+  InputAdornment,
   MenuItem,
   Paper,
   Select,
-  styled,
   Table,
   TableBody,
   TableCell,
@@ -15,7 +15,8 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from '@mui/material'
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
@@ -61,6 +62,27 @@ const CountryList = () => {
           type='text'
           placeholder='Search...'
           onChange={handleSearch}
+          startAdornment={
+            <InputAdornment position="start">
+              <SearchIcon fontSize='medium'/>
+            </InputAdornment>
+          }
+          sx={{
+            border: '1px solid rgba(0, 0, 0, 0.42)',
+            borderRadius: '4px',
+            'inputProps': {
+              backgroundColor: 'red',
+            },
+            '&:hover:not(.Mui-disabled):before': {
+              borderBottom: 'none'
+            },
+            '&:after': {
+              borderBottom: 'none'
+            },
+            '&:before': {
+              borderBottom: 'none'
+            }
+          }}
         />
 
         <FormControl sx={{
