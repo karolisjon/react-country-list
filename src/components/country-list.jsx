@@ -20,17 +20,48 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
-  const [sortState, setSortState] = React.useState('ascendingName');
+  const [name, setName] = React.useState('ascendingName');
+  const [region, setRegion] = React.useState('');
   const [searchTerm, setSearchTerm] = React.useState('');
 
-  const sortMethods = {
+  const sortNameMethods = {
     '': { method: (a, b) => null },
     ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
     descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
   };
 
-  const handleSort = (event) => {
-    setSortState(event.target.value);
+  // const fetchByCountryRegion = async (x) => {
+  //   const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
+  //   const data = await response.json();
+
+  //   const asia = await data.filter((country) => country.region === x);
+  //   setCountries(asia);
+  // };
+
+  const sortRegionMethods = {
+    '': {
+      method: async () => {
+        const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
+        const data = await response.json();
+
+        setCountries(data);
+      }
+    },
+    asia: { method: async () => {
+      const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
+      const data = await response.json();
+  
+      const asia = await data.filter((country) => country.region === 'Asia');
+      setCountries(asia);
+    } }
+  };
+
+  const handleSortName = (event) => {
+    setName(event.target.value);
+  };
+
+  const handleSortRegion = (event) => {
+    setRegion(event.target.value);
   };
 
   const handleSearch = (event) => {
@@ -49,7 +80,7 @@ const CountryList = () => {
   }, []);
 
   return (
-    <Container maxWidth='md'>
+    <Container maxWidth='md' >
 
       <Box sx={{
         display: 'flex',
@@ -64,7 +95,7 @@ const CountryList = () => {
           onChange={handleSearch}
           startAdornment={
             <InputAdornment position="start">
-              <SearchIcon fontSize='medium'/>
+              <SearchIcon fontSize='medium' />
             </InputAdornment>
           }
           sx={{
@@ -91,11 +122,34 @@ const CountryList = () => {
           alignItems: 'baseline',
           '&:nth-of-type(1)': { mr: 2 }
         }}>
+          <Typography sx={{ mr: 1 }}>REGION</Typography>
+          <Select
+            variant='standard'
+            value={region}
+            onChange={handleSortRegion}
+            sx={{ minWidth: 140, my: 2 }}
+          >
+            <MenuItem value='all'>All</MenuItem>
+            <MenuItem value='asia'>Africa</MenuItem>
+            <MenuItem value='asia'>Asia</MenuItem>
+            <MenuItem value='asia'>Americas</MenuItem>
+            <MenuItem value='asia'>Antarctic Ocean</MenuItem>
+            <MenuItem value='asia'>Oceania</MenuItem>
+            <MenuItem value='asia'>Polar</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'baseline',
+          '&:nth-of-type(1)': { mr: 2 }
+        }}>
           <Typography sx={{ mr: 1 }}>SORT NAME</Typography>
           <Select
             variant='standard'
-            value={sortState}
-            onChange={handleSort}
+            value={name}
+            onChange={handleSortName}
             sx={{ minWidth: 140, my: 2 }}
           >
             <MenuItem value='ascendingName'>A to Z</MenuItem>
@@ -121,7 +175,10 @@ const CountryList = () => {
               } else if (country.name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 return country;
               }
-            }).sort(sortMethods[sortState].method).map(({ index, name, region, area, independent }) => (
+            })
+            // .sort(sortRegionMethods[region].method)
+            .sort(sortNameMethods[name].method)
+            .map(({ index, name, region, area, independent }) => (
               <TableRow
                 sx={{
                   '&:hover': {
