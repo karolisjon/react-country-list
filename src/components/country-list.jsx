@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Box,
+  Button,
   Container,
   FormControl,
   Input,
@@ -20,53 +21,9 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
-  const [name, setName] = React.useState('ascendingName');
-  const [region, setRegion] = React.useState('');
+  const [sort, setSort] = React.useState('ascendingName');
+  // const [region, setRegion] = React.useState('');
   const [searchTerm, setSearchTerm] = React.useState('');
-
-  const sortNameMethods = {
-    '': { method: (a, b) => null },
-    ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
-    descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
-  };
-
-  // const fetchByCountryRegion = async (x) => {
-  //   const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
-  //   const data = await response.json();
-
-  //   const asia = await data.filter((country) => country.region === x);
-  //   setCountries(asia);
-  // };
-
-  const sortRegionMethods = {
-    '': {
-      method: async () => {
-        const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
-        const data = await response.json();
-
-        setCountries(data);
-      }
-    },
-    asia: { method: async () => {
-      const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
-      const data = await response.json();
-  
-      const asia = await data.filter((country) => country.region === 'Asia');
-      setCountries(asia);
-    } }
-  };
-
-  const handleSortName = (event) => {
-    setName(event.target.value);
-  };
-
-  const handleSortRegion = (event) => {
-    setRegion(event.target.value);
-  };
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
 
   const fetchAll = async () => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
@@ -74,6 +31,33 @@ const CountryList = () => {
 
     setCountries(data);
   }
+
+  const fetchByRegion = async (value) => {
+    const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
+    const data = await response.json();
+
+    const region = data.filter((country) => country.region === value);
+
+    setCountries(region);
+  };
+
+  const sortMethods = {
+    '': { method: (a, b) => null },
+    ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
+    descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
+  };
+
+  const handleSortMethods = (event) => {
+    setSort(event.target.value);
+  };
+
+  const handleRegion = (event) => {
+    fetchByRegion(event.target.value);
+  };
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
   React.useEffect(() => {
     fetchAll();
@@ -122,20 +106,15 @@ const CountryList = () => {
           alignItems: 'baseline',
           '&:nth-of-type(1)': { mr: 2 }
         }}>
-          <Typography sx={{ mr: 1 }}>REGION</Typography>
+          <Typography sx={{ mr: 1 }}>SORT REGION</Typography>
           <Select
             variant='standard'
-            value={region}
-            onChange={handleSortRegion}
+            value=''
+            onChange={handleRegion}
             sx={{ minWidth: 140, my: 2 }}
           >
-            <MenuItem value='all'>All</MenuItem>
-            <MenuItem value='asia'>Africa</MenuItem>
-            <MenuItem value='asia'>Asia</MenuItem>
-            <MenuItem value='asia'>Americas</MenuItem>
-            <MenuItem value='asia'>Antarctic Ocean</MenuItem>
-            <MenuItem value='asia'>Oceania</MenuItem>
-            <MenuItem value='asia'>Polar</MenuItem>
+            <MenuItem value='Asia'>Asia</MenuItem>
+            <MenuItem value='Europe'>Europe</MenuItem>
           </Select>
         </FormControl>
 
@@ -148,8 +127,8 @@ const CountryList = () => {
           <Typography sx={{ mr: 1 }}>SORT NAME</Typography>
           <Select
             variant='standard'
-            value={name}
-            onChange={handleSortName}
+            value={sort}
+            onChange={handleSortMethods}
             sx={{ minWidth: 140, my: 2 }}
           >
             <MenuItem value='ascendingName'>A to Z</MenuItem>
@@ -176,30 +155,29 @@ const CountryList = () => {
                 return country;
               }
             })
-            // .sort(sortRegionMethods[region].method)
-            .sort(sortNameMethods[name].method)
-            .map(({ index, name, region, area, independent }) => (
-              <TableRow
-                sx={{
-                  '&:hover': {
-                    cursor: 'pointer',
-                    backgroundColor: 'rgb(216 210 251)'
-                  },
-                  '&:nth-of-type(odd)': {
-                    backgroundColor: 'rgb(241 239 253)',
+            .sort(sortMethods[sort].method)
+              .map(({ index, name, region, area, independent }) => (
+                <TableRow
+                  sx={{
                     '&:hover': {
+                      cursor: 'pointer',
                       backgroundColor: 'rgb(216 210 251)'
                     },
-                  },
-                }}
-                key={index}
-              >
-                <TableCell>{name}</TableCell>
-                <TableCell align='right'>{region}</TableCell>
-                <TableCell align='right'>{area}</TableCell>
-                <TableCell align='right'>{independent.toString()}</TableCell>
-              </TableRow>
-            ))}
+                    '&:nth-of-type(odd)': {
+                      backgroundColor: 'rgb(241 239 253)',
+                      '&:hover': {
+                        backgroundColor: 'rgb(216 210 251)'
+                      },
+                    },
+                  }}
+                  key={index}
+                >
+                  <TableCell>{name}</TableCell>
+                  <TableCell align='right'>{region}</TableCell>
+                  <TableCell align='right'>{area}</TableCell>
+                  <TableCell align='right'>{independent.toString()}</TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer >
