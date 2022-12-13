@@ -164,7 +164,7 @@ const CountryList = () => {
               }
             })
               .sort(sortMethods[sort].method)
-              .map(({ index, name, region, area, independent }) => (
+              .map(({ name, region, area, independent }, index) => (
                 <TableRow
                   sx={{
                     '&:hover': {
