@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
   Box,
-  Button,
   Container,
   FormControl,
   Input,
@@ -22,7 +21,7 @@ import SearchIcon from '@mui/icons-material/Search';
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
   const [sort, setSort] = React.useState('ascendingName');
-  // const [region, setRegion] = React.useState('');
+  const [region, setRegion] = React.useState('All');
   const [searchTerm, setSearchTerm] = React.useState('');
 
   const fetchAll = async () => {
@@ -30,7 +29,7 @@ const CountryList = () => {
     const data = await response.json();
 
     setCountries(data);
-  }
+  };
 
   const fetchByRegion = async (value) => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
@@ -52,7 +51,8 @@ const CountryList = () => {
   };
 
   const handleRegion = (event) => {
-    fetchByRegion(event.target.value);
+    event.target.value === 'All' ? fetchAll() : fetchByRegion(event.target.value);
+    setRegion(event.target.value);
   };
 
   const handleSearch = (event) => {
@@ -106,24 +106,6 @@ const CountryList = () => {
           alignItems: 'baseline',
           '&:nth-of-type(1)': { mr: 2 }
         }}>
-          <Typography sx={{ mr: 1 }}>SORT REGION</Typography>
-          <Select
-            variant='standard'
-            value=''
-            onChange={handleRegion}
-            sx={{ minWidth: 140, my: 2 }}
-          >
-            <MenuItem value='Asia'>Asia</MenuItem>
-            <MenuItem value='Europe'>Europe</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'baseline',
-          '&:nth-of-type(1)': { mr: 2 }
-        }}>
           <Typography sx={{ mr: 1 }}>SORT NAME</Typography>
           <Select
             variant='standard'
@@ -135,6 +117,32 @@ const CountryList = () => {
             <MenuItem value='descendingName'>Z to A</MenuItem>
           </Select>
         </FormControl>
+
+        <FormControl sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'baseline',
+          '&:nth-of-type(1)': { mr: 2 }
+        }}>
+          <Typography sx={{ mr: 1 }}>SORT REGION</Typography>
+          <Select
+            variant='standard'
+            value={region}
+            onChange={handleRegion}
+            sx={{ minWidth: 140, my: 2 }}
+          >
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Africa">Africa</MenuItem>
+            <MenuItem value="Americas">Americas</MenuItem>
+            <MenuItem value="Antarctic">Antarctic</MenuItem>
+            <MenuItem value="Antarctic Ocean">Antarctic Ocean</MenuItem>
+            <MenuItem value="Asia">Asia</MenuItem>
+            <MenuItem value="Europe">Europe</MenuItem>
+            <MenuItem value="Oceania">Oceania</MenuItem>
+            <MenuItem value="Polar">Polar</MenuItem>
+          </Select>
+        </FormControl>
+
       </Box>
 
       <TableContainer component={Paper}>
@@ -155,7 +163,7 @@ const CountryList = () => {
                 return country;
               }
             })
-            .sort(sortMethods[sort].method)
+              .sort(sortMethods[sort].method)
               .map(({ index, name, region, area, independent }) => (
                 <TableRow
                   sx={{
