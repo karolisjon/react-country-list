@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Box,
+  Button,
   Container,
   FormControl,
   Input,
@@ -17,12 +18,15 @@ import {
   Typography,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
   const [sort, setSort] = React.useState('ascendingName');
   const [region, setRegion] = React.useState('All');
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [inputValue, setInputValue] = React.useState('');
+  const inputRef = React.useRef(null);
 
   const fetchAll = async () => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
@@ -40,28 +44,38 @@ const CountryList = () => {
     setCountries(region);
   };
 
-  const sortMethods = {
+  const sortNameMethods = {
     '': { method: (a, b) => null },
     ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
     descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
   };
 
-  const handleSortMethods = (event) => {
+  const handleSortNameMethods = (event) => {
     setSort(event.target.value);
   };
 
-  const handleRegion = (event) => {
+  const handleFilterRegion = (event) => {
     event.target.value === 'All' ? fetchAll() : fetchByRegion(event.target.value);
     setRegion(event.target.value);
   };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
+    setInputValue(event.target.value);
+  };
+
+  const handleClearInput = () => {
+    setSearchTerm('');
+    setInputValue('');
   };
 
   React.useEffect(() => {
     fetchAll();
   }, []);
+
+  React.useEffect(() => {
+    inputRef.current = inputValue;
+  }, [inputValue]);
 
   return (
     <Container maxWidth='md' >
@@ -74,12 +88,23 @@ const CountryList = () => {
       }}>
 
         <Input
-          type='text'
           placeholder='Search...'
+          value={inputValue}
+          ref={inputRef}
           onChange={handleSearch}
           startAdornment={
             <InputAdornment position="start">
               <SearchIcon fontSize='medium' />
+            </InputAdornment>
+          }
+          endAdornment={
+            <InputAdornment
+              type='submit'
+              position="end"
+              onClick={handleClearInput}
+              sx={{ cursor: 'pointer' }}
+            >
+              <ClearIcon fontSize='medium' />
             </InputAdornment>
           }
           sx={{
@@ -110,7 +135,7 @@ const CountryList = () => {
           <Select
             variant='standard'
             value={sort}
-            onChange={handleSortMethods}
+            onChange={handleSortNameMethods}
             sx={{ minWidth: 140, my: 2 }}
           >
             <MenuItem value='ascendingName'>A to Z</MenuItem>
@@ -124,11 +149,11 @@ const CountryList = () => {
           alignItems: 'baseline',
           '&:nth-of-type(1)': { mr: 2 }
         }}>
-          <Typography sx={{ mr: 1 }}>SORT REGION</Typography>
+          <Typography sx={{ mr: 1 }}>FILTER REGION</Typography>
           <Select
             variant='standard'
             value={region}
-            onChange={handleRegion}
+            onChange={handleFilterRegion}
             sx={{ minWidth: 140, my: 2 }}
           >
             <MenuItem value="All">All</MenuItem>
@@ -163,7 +188,7 @@ const CountryList = () => {
                 return country;
               }
             })
-              .sort(sortMethods[sort].method)
+              .sort(sortNameMethods[sort].method)
               .map(({ name, region, area, independent }, index) => (
                 <TableRow
                   sx={{
