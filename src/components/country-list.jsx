@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import Paginate from './paginate';
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
@@ -26,6 +27,8 @@ const CountryList = () => {
   const [region, setRegion] = React.useState('All');
   const [searchTerm, setSearchTerm] = React.useState('');
   const [inputValue, setInputValue] = React.useState('');
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [countriesPerPage] = React.useState(10);
   const inputRef = React.useRef(null);
 
   const fetchAll = async () => {
@@ -76,6 +79,13 @@ const CountryList = () => {
   React.useEffect(() => {
     inputRef.current = inputValue;
   }, [inputValue]);
+
+  const indexOfLastCountry = currentPage * countriesPerPage;
+  const indexOfFirstCountry = indexOfLastCountry - countriesPerPage;
+
+  const currentCountries = countries.slice(indexOfFirstCountry, indexOfLastCountry);
+
+  const nPages = Math.ceil(countries.length / countriesPerPage);
 
   return (
     <Container maxWidth='md' >
@@ -181,7 +191,7 @@ const CountryList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {countries.filter((country) => {
+            {currentCountries.filter((country) => {
               if (searchTerm === '') {
                 return country;
               } else if (country.name.toLowerCase().includes(searchTerm.toLowerCase())) {
@@ -214,6 +224,12 @@ const CountryList = () => {
           </TableBody>
         </Table>
       </TableContainer >
+
+      <Paginate
+        nPages={nPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </Container >
   )
 }
