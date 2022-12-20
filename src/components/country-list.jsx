@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {
   Box,
-  Button,
+  // Button,
   Container,
   FormControl,
   Input,
   InputAdornment,
   MenuItem,
+  Pagination,
   Paper,
   Select,
   Table,
@@ -19,7 +20,8 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
-import Paginate from './paginate';
+
+const pageSize = 10;
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
@@ -27,15 +29,27 @@ const CountryList = () => {
   const [region, setRegion] = React.useState('All');
   const [searchTerm, setSearchTerm] = React.useState('');
   const [inputValue, setInputValue] = React.useState('');
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [countriesPerPage] = React.useState(10);
+  const [pagination, setPagination] = React.useState({
+    count: 0,
+    from: 0,
+    to: pageSize,
+  });
+
   const inputRef = React.useRef(null);
 
-  const fetchAll = async () => {
+  const fetchAll = async ({ from, to }) => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
     const data = await response.json();
 
-    setCountries(data);
+    const countriesPerPage = data.slice(from, to);
+
+    const dataObj = {
+      count: data.length,
+      countries: countriesPerPage,
+    };
+
+    setCountries(dataObj.countries);
+    setPagination({...pagination, count: dataObj.count})
   };
 
   const fetchByRegion = async (value) => {
@@ -72,20 +86,20 @@ const CountryList = () => {
     setInputValue('');
   };
 
+  const handlePageChange = (event, page) => {
+    const from = (page - 1) * pageSize;
+    const to = (page - 1) * pageSize + pageSize;
+
+    setPagination({...pagination, from: from, to: to})
+  };
+
   React.useEffect(() => {
-    fetchAll();
-  }, []);
+    fetchAll({ from: pagination.from, to: pagination.to });
+  }, [pagination.from, pagination.to]);
 
   React.useEffect(() => {
     inputRef.current = inputValue;
   }, [inputValue]);
-
-  const indexOfLastCountry = currentPage * countriesPerPage;
-  const indexOfFirstCountry = indexOfLastCountry - countriesPerPage;
-
-  const currentCountries = countries.slice(indexOfFirstCountry, indexOfLastCountry);
-
-  const nPages = Math.ceil(countries.length / countriesPerPage);
 
   return (
     <Container maxWidth='md' >
@@ -191,7 +205,7 @@ const CountryList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {currentCountries.filter((country) => {
+            {countries.filter((country) => {
               if (searchTerm === '') {
                 return country;
               } else if (country.name.toLowerCase().includes(searchTerm.toLowerCase())) {
@@ -225,11 +239,12 @@ const CountryList = () => {
         </Table>
       </TableContainer >
 
-      <Paginate
-        nPages={nPages}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+      <Pagination
+        shape="rounded"
+        count={Math.ceil(pagination.count / pageSize)}
+        onChange={handlePageChange}
       />
+
     </Container >
   )
 }
