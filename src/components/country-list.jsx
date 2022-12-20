@@ -1,13 +1,11 @@
 import * as React from 'react';
 import {
   Box,
-  // Button,
   Container,
   FormControl,
   Input,
   InputAdornment,
   MenuItem,
-  Pagination,
   Paper,
   Select,
   Table,
@@ -20,8 +18,9 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import Paginate from './paginate';
 
-const pageSize = 10;
+const pageSize = 12;
 
 const CountryList = () => {
   const [countries, setCountries] = React.useState([]);
@@ -49,7 +48,7 @@ const CountryList = () => {
     };
 
     setCountries(dataObj.countries);
-    setPagination({...pagination, count: dataObj.count})
+    setPagination({ ...pagination, count: dataObj.count })
   };
 
   const fetchByRegion = async (value) => {
@@ -90,12 +89,12 @@ const CountryList = () => {
     const from = (page - 1) * pageSize;
     const to = (page - 1) * pageSize + pageSize;
 
-    setPagination({...pagination, from: from, to: to})
+    setPagination({ ...pagination, from: from, to: to })
   };
 
   React.useEffect(() => {
     fetchAll({ from: pagination.from, to: pagination.to });
-  }, [pagination.from, pagination.to]);
+  }, []);
 
   React.useEffect(() => {
     inputRef.current = inputValue;
@@ -239,10 +238,10 @@ const CountryList = () => {
         </Table>
       </TableContainer >
 
-      <Pagination
-        shape="rounded"
-        count={Math.ceil(pagination.count / pageSize)}
-        onChange={handlePageChange}
+      <Paginate
+        pageSize={pageSize}
+        pagination={pagination}
+        handlePageChange={handlePageChange}
       />
 
     </Container >
