@@ -19,6 +19,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import Paginate from './paginate';
+import CountryTable from './country-table';
 
 const pageSize = 12;
 
@@ -47,8 +48,7 @@ const CountryList = () => {
       countries: countriesPerPage,
     };
 
-    setCountries(dataObj.countries);
-    setPagination({ ...pagination, count: dataObj.count })
+    return dataObj;
   };
 
   const fetchByRegion = async (value) => {
@@ -60,18 +60,26 @@ const CountryList = () => {
     setCountries(region);
   };
 
-  const sortNameMethods = {
-    '': { method: (a, b) => null },
-    ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
-    descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
-  };
+  // const sortNameMethods = {
+  //   '': { method: (a, b) => null },
+  //   ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
+  //   descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
+  // };
 
   const handleSortNameMethods = (event) => {
     setSort(event.target.value);
   };
 
   const handleFilterRegion = (event) => {
-    event.target.value === 'All' ? fetchAll() : fetchByRegion(event.target.value);
+    event.target.value === 'All' ? fetchAll({
+      from: pagination.from,
+      to: pagination.to
+    }).then((response) => {
+      setCountries(response.countries);
+      setPagination({ ...pagination, count: response.count })
+    })
+      : fetchByRegion(event.target.value);
+
     setRegion(event.target.value);
   };
 
@@ -93,8 +101,14 @@ const CountryList = () => {
   };
 
   React.useEffect(() => {
-    fetchAll({ from: pagination.from, to: pagination.to });
-  }, []);
+    fetchAll({
+      from: pagination.from,
+      to: pagination.to
+    }).then((response) => {
+      setCountries(response.countries);
+      setPagination({ ...pagination, count: response.count })
+    });
+  }, [pagination.from, pagination.to]);
 
   React.useEffect(() => {
     inputRef.current = inputValue;
@@ -193,50 +207,11 @@ const CountryList = () => {
 
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table aria-label="customized table">
-          <TableHead sx={{ backgroundColor: '#000' }}>
-            <TableRow>
-              <TableCell sx={{ color: '#fff' }}>Name</TableCell>
-              <TableCell align='right' sx={{ color: '#fff' }}>Region</TableCell>
-              <TableCell align='right' sx={{ color: '#fff' }}>Area</TableCell>
-              <TableCell align='right' sx={{ color: '#fff' }}>Independent</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {countries.filter((country) => {
-              if (searchTerm === '') {
-                return country;
-              } else if (country.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-                return country;
-              }
-            })
-              .sort(sortNameMethods[sort].method)
-              .map(({ name, region, area, independent }, index) => (
-                <TableRow
-                  sx={{
-                    '&:hover': {
-                      cursor: 'pointer',
-                      backgroundColor: 'rgb(216 210 251)'
-                    },
-                    '&:nth-of-type(odd)': {
-                      backgroundColor: 'rgb(241 239 253)',
-                      '&:hover': {
-                        backgroundColor: 'rgb(216 210 251)'
-                      },
-                    },
-                  }}
-                  key={index}
-                >
-                  <TableCell>{name}</TableCell>
-                  <TableCell align='right'>{region}</TableCell>
-                  <TableCell align='right'>{area}</TableCell>
-                  <TableCell align='right'>{independent.toString()}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer >
+      <CountryTable
+        countries={countries}
+        searchTerm={searchTerm}
+        sort={sort}
+      />
 
       <Paginate
         pageSize={pageSize}
