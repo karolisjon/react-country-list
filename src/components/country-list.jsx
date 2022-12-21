@@ -10,6 +10,8 @@ import {
 import Paginate from './paginate';
 import CountryTable from './country-table';
 import Search from './search';
+import SortNameSelect from './sort-name-select';
+import SortRegionSelect from './sort-region-select';
 
 const pageSize = 12;
 
@@ -83,7 +85,6 @@ const CountryList = () => {
 
   return (
     <Container maxWidth='md' >
-
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',
@@ -91,52 +92,15 @@ const CountryList = () => {
         alignItems: 'center',
       }}>
         <Search setSearchTerm={setSearchTerm} />
-
-        <FormControl sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'baseline',
-          '&:nth-of-type(1)': { mr: 2 }
-        }}>
-          <Typography sx={{ mr: 1 }}>SORT NAME</Typography>
-          <Select
-            variant='standard'
-            value={sort}
-            onChange={handleSortNameMethods}
-            sx={{ minWidth: 140, my: 2 }}
-          >
-            <MenuItem value='ascendingName'>A to Z</MenuItem>
-            <MenuItem value='descendingName'>Z to A</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'baseline',
-          '&:nth-of-type(1)': { mr: 2 }
-        }}>
-          <Typography sx={{ mr: 1 }}>FILTER REGION</Typography>
-          <Select
-            variant='standard'
-            value={region}
-            onChange={handleFilterRegion}
-            sx={{ minWidth: 140, my: 2 }}
-          >
-            <MenuItem value="All">All</MenuItem>
-            <MenuItem value="Africa">Africa</MenuItem>
-            <MenuItem value="Americas">Americas</MenuItem>
-            <MenuItem value="Antarctic">Antarctic</MenuItem>
-            <MenuItem value="Antarctic Ocean">Antarctic Ocean</MenuItem>
-            <MenuItem value="Asia">Asia</MenuItem>
-            <MenuItem value="Europe">Europe</MenuItem>
-            <MenuItem value="Oceania">Oceania</MenuItem>
-            <MenuItem value="Polar">Polar</MenuItem>
-          </Select>
-        </FormControl>
-
+        <SortNameSelect
+          sort={sort}
+          handleSortNameMethods={handleSortNameMethods}
+        />
+        <SortRegionSelect
+          region={region}
+          handleFilterRegion={handleFilterRegion}
+        />
       </Box>
-
       <CountryTable
         countries={countries}
         searchTerm={searchTerm}
