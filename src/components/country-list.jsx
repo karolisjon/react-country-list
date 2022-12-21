@@ -3,23 +3,13 @@ import {
   Box,
   Container,
   FormControl,
-  Input,
-  InputAdornment,
   MenuItem,
-  Paper,
   Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
 import Paginate from './paginate';
 import CountryTable from './country-table';
+import Search from './search';
 
 const pageSize = 12;
 
@@ -28,14 +18,11 @@ const CountryList = () => {
   const [sort, setSort] = React.useState('ascendingName');
   const [region, setRegion] = React.useState('All');
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [inputValue, setInputValue] = React.useState('');
   const [pagination, setPagination] = React.useState({
     count: 0,
     from: 0,
     to: pageSize,
   });
-
-  const inputRef = React.useRef(null);
 
   const fetchAll = async ({ from, to }) => {
     const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
@@ -60,12 +47,6 @@ const CountryList = () => {
     setCountries(region);
   };
 
-  // const sortNameMethods = {
-  //   '': { method: (a, b) => null },
-  //   ascendingName: { method: (a, b) => a.name.localeCompare(b.name, 'en') },
-  //   descendingName: { method: (a, b) => b.name.localeCompare(a.name, 'en') },
-  // };
-
   const handleSortNameMethods = (event) => {
     setSort(event.target.value);
   };
@@ -81,16 +62,6 @@ const CountryList = () => {
       : fetchByRegion(event.target.value);
 
     setRegion(event.target.value);
-  };
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-    setInputValue(event.target.value);
-  };
-
-  const handleClearInput = () => {
-    setSearchTerm('');
-    setInputValue('');
   };
 
   const handlePageChange = (event, page) => {
@@ -110,10 +81,6 @@ const CountryList = () => {
     });
   }, [pagination.from, pagination.to]);
 
-  React.useEffect(() => {
-    inputRef.current = inputValue;
-  }, [inputValue]);
-
   return (
     <Container maxWidth='md' >
 
@@ -123,44 +90,7 @@ const CountryList = () => {
         justifyContent: 'space-between',
         alignItems: 'center',
       }}>
-
-        <Input
-          placeholder='Search...'
-          value={inputValue}
-          ref={inputRef}
-          onChange={handleSearch}
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon fontSize='medium' />
-            </InputAdornment>
-          }
-          endAdornment={
-            <InputAdornment
-              type='submit'
-              position="end"
-              onClick={handleClearInput}
-              sx={{ cursor: 'pointer' }}
-            >
-              <ClearIcon fontSize='medium' />
-            </InputAdornment>
-          }
-          sx={{
-            border: '1px solid rgba(0, 0, 0, 0.42)',
-            borderRadius: '4px',
-            'inputProps': {
-              backgroundColor: 'red',
-            },
-            '&:hover:not(.Mui-disabled):before': {
-              borderBottom: 'none'
-            },
-            '&:after': {
-              borderBottom: 'none'
-            },
-            '&:before': {
-              borderBottom: 'none'
-            }
-          }}
-        />
+        <Search setSearchTerm={setSearchTerm} />
 
         <FormControl sx={{
           display: 'flex',
@@ -212,13 +142,11 @@ const CountryList = () => {
         searchTerm={searchTerm}
         sort={sort}
       />
-
       <Paginate
         pageSize={pageSize}
         pagination={pagination}
         handlePageChange={handlePageChange}
       />
-
     </Container >
   )
 }
