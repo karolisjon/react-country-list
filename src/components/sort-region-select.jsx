@@ -1,7 +1,36 @@
-import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 import * as React from 'react';
+import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 
-const SortRegionSelect = ({ region, handleFilterRegion }) => {
+const SortRegionSelect = ({
+  pagination,
+  setPagination,
+  setCountries,
+  fetchAll
+}) => {
+  const [region, setRegion] = React.useState('All');
+
+  const fetchByRegion = async (value) => {
+    const response = await fetch('https://restcountries.com/v2/all?fields=name,region,area');
+    const data = await response.json();
+
+    const region = data.filter((country) => country.region === value);
+
+    setCountries(region);
+  };
+
+  const handleFilterRegion = (event) => {
+    event.target.value === 'All' ? fetchAll({
+      from: pagination.from,
+      to: pagination.to
+    }).then((response) => {
+      setCountries(response.countries);
+      setPagination({ ...pagination, count: response.count })
+    })
+      : fetchByRegion(event.target.value);
+
+    setRegion(event.target.value);
+  };
+
   return (
     <FormControl sx={{
       display: 'flex',
